@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>FlyingSalmon</title>
+    
+    <!-- Load the Processing.js library -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/processing.js/1.6.0/processing.min.js"></script>
+	</head>
+	<body>
+		<script type="application/processing">
+			int cols;
+int rows;
+int scl = 20;
+int w = 3600;
+int h = 1600;
+
+// UI - close up flying ( the larger the number the closer to the surface  // 50 - 250
+int mappingOffset = 50;
+
+// UI - high highs and low lows .. how steep the terrain will look like // 0.07 - 0.15 - 0.4
+float organicTerrainOffset = 0.15;
+
+float flyingY = 0;
+// UI - redbull pilot or what // 0.02 - 0.09
+float flyingSpeed = 0.04;
+
+float [][] terrain;
+
+void setup() {
+  size(600, 600, P3D);
+
+  cols = w/scl;
+  rows = h/scl;
+  
+  terrain = new float[cols][rows];
+  
+}
+
+void draw() {
+  
+  flyingY = flyingY - flyingSpeed;
+  
+  float yoff = flyingY;
+  for(int y=0 ; y<rows ; y++){
+    float xoff = 0;
+    for(int x=0 ; x<cols ; x++){
+      terrain[x][y] = map(noise(xoff, yoff), 0, 1, -mappingOffset, mappingOffset);
+      xoff = xoff + organicTerrainOffset;
+    }
+    yoff = yoff + organicTerrainOffset;
+  }
+  
+  background(0);
+  stroke(255);
+  noFill();
+
+  translate(width/2, height/2);
+  rotateX(PI/3);
+  translate(-w/2, -h/2);
+  
+  for(int y=0 ; y<rows-1 ; y++){
+    beginShape(TRIANGLE_STRIP);
+    for(int x=0 ; x<cols ; x++){
+      vertex(x*scl, y*scl, terrain[x][y]);
+      vertex(x*scl, (y+1)*scl, terrain[x][y+1]);
+    }
+    endShape();
+  } 
+}
+		</script>
+		<canvas id="sketch"> </canvas>
+		<p id="label"></p>
+	</body>
+</html>
